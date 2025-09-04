@@ -54,48 +54,45 @@ const StudentLogin = () => {
   }, [resendTimer]);
 
   const sendOtp = async (phone, studentDocId) => {
-    if (!phone || !studentDocId) {
-      Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: "Phone number or student ID is missing!",
-        confirmButtonColor: "#EF4444",
-      });
-      return false;
+  if (!phone || !studentDocId) {
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: "Phone number or student ID is missing!",
+      confirmButtonColor: "#EF4444",
+    });
+    return false;
+  }
+  try {
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
     }
-    try {
-      if (!auth.currentUser) {
-        await signInAnonymously(auth);
-      }
-      const response = await axios.post(
-        "https://us-central1-blind-date-web-84b3d.cloudfunctions.net/sendOtp",
-        {
-          phone,
-          studentDocId,
-        }
-      );
-      if (response.data.success) {
-        Swal.fire({
-          icon: "success",
-          title: "OTP Sent!",
-          text: `A 6-digit OTP was sent to ${phone}`,
-          confirmButtonColor: "#ec4899",
-        });
-        setResendTimer(OTP_RATE_LIMIT);
-        return true;
-      } else {
-        throw new Error(response.data.error || "Failed to send OTP");
-      }
-    } catch (err) {
+    const response = await axios.post(
+      process.env.REACT_APP_OTP_API_URL || "https://sendotp-7gg6sq4r6q-uc.a.run.app",
+      { phone, studentDocId }
+    );
+    if (response.data.success) {
       Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: err.message || "Could not send OTP. Try again.",
-        confirmButtonColor: "#EF4444",
+        icon: "success",
+        title: "OTP Sent!",
+        text: `A 6-digit OTP was sent to ${phone}`,
+        confirmButtonColor: "#ec4899",
       });
-      return false;
+      setResendTimer(OTP_RATE_LIMIT);
+      return true;
+    } else {
+      throw new Error(response.data.error || "Failed to send OTP");
     }
-  };
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "Failed",
+      text: err.message || "Could not send OTP. Try again.",
+      confirmButtonColor: "#EF4444",
+    });
+    return false;
+  }
+};
 
   const handleIdSubmit = async (e) => {
     e.preventDefault();
