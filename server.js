@@ -1,10 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const admin = require("firebase-admin");
 
-// Initialize Firebase Admin with service account
-const serviceAccount = require("./blind-date-web-84b3d-firebase-adminsdk-fbsvc-dd2f6d545b.json");
+// Initialize Firebase Admin with environment variable
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -19,6 +20,9 @@ app.use(express.json());
 // OTP settings
 const OTP_EXPIRY = 300; // 5 minutes
 const OTP_RATE_LIMIT = 60; // 1 OTP per 60 seconds
+
+// Arkesel API key from environment variable
+const ARKESEL_API_KEY = process.env.ARKESEL_API_KEY;
 
 // Endpoint to send OTP
 app.post("/send-otp", async (req, res) => {
@@ -67,7 +71,7 @@ app.post("/send-otp", async (req, res) => {
       const response = await axios.get("https://sms.arkesel.com/sms/api", {
         params: {
           action: "send-sms",
-          api_key: "VGhuaU54eUx6d1ltcnlwb0tleEg", // Your Arkesel API key
+          api_key: ARKESEL_API_KEY,
           to: phone,
           from: "Acolatse",
           sms: `Your OTP code is ${otpCode}. It expires in 5 minutes.`,
@@ -100,7 +104,7 @@ app.post("/send-sms", async (req, res) => {
     const response = await axios.get("https://sms.arkesel.com/sms/api", {
       params: {
         action: "send-sms",
-        api_key: "VGhuaU54eUx6d1ltcnlwb0tleEg", // Your Arkesel API key
+        api_key: ARKESEL_API_KEY,
         to: phone,
         from: "AcolatseVodziHall",
         sms: message,
