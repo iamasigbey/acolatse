@@ -54,45 +54,45 @@ const StudentLogin = () => {
   }, [resendTimer]);
 
   const sendOtp = async (phone, studentDocId) => {
-  if (!phone || !studentDocId) {
-    Swal.fire({
-      icon: "error",
-      title: "Failed",
-      text: "Phone number or student ID is missing!",
-      confirmButtonColor: "#EF4444",
-    });
-    return false;
-  }
-  try {
-    if (!auth.currentUser) {
-      await signInAnonymously(auth);
-    }
-    const response = await axios.post(
-      process.env.REACT_APP_OTP_API_URL || "https://sendotp-7gg6sq4r6q-uc.a.run.app",
-      { phone, studentDocId }
-    );
-    if (response.data.success) {
+    if (!phone || !studentDocId) {
       Swal.fire({
-        icon: "success",
-        title: "OTP Sent!",
-        text: `A 6-digit OTP was sent to ${phone}`,
-        confirmButtonColor: "#ec4899",
+        icon: "error",
+        title: "Failed",
+        text: "Phone number or student ID is missing!",
+        confirmButtonColor: "#EF4444",
       });
-      setResendTimer(OTP_RATE_LIMIT);
-      return true;
-    } else {
-      throw new Error(response.data.error || "Failed to send OTP");
+      return false;
     }
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Failed",
-      text: err.message || "Could not send OTP. Try again.",
-      confirmButtonColor: "#EF4444",
-    });
-    return false;
-  }
-};
+    try {
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      }
+      const response = await axios.post(
+        process.env.REACT_APP_OTP_API_URL || "https://sendotp-7gg6sq4r6q-uc.a.run.app",
+        { phone, studentDocId }
+      );
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "OTP Sent!",
+          text: `A 6-digit OTP was sent to ${phone}`,
+          confirmButtonColor: "#ec4899",
+        });
+        setResendTimer(OTP_RATE_LIMIT);
+        return true;
+      } else {
+        throw new Error(response.data.error || "Failed to send OTP");
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: err.message || "Could not send OTP. Try again.",
+        confirmButtonColor: "#EF4444",
+      });
+      return false;
+    }
+  };
 
   const handleIdSubmit = async (e) => {
     e.preventDefault();
@@ -208,7 +208,7 @@ const StudentLogin = () => {
   };
 
   return (
-    <div className="font-poppins bg-pink-50 heart-bg min-h-screen flex flex-col items-center justify-between p-4 relative overflow-hidden">
+    <div className="font-poppins bg-pink-50 heart-bg min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       <div className="floating-hearts" id="hearts-container"></div>
       <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-xl relative z-10">
         {step === "id" && (
@@ -254,6 +254,17 @@ const StudentLogin = () => {
                   "Continue with Love"
                 )}
               </button>
+              <div className="text-center mt-4 text-pink-600">
+                <a
+                  href="https://wa.me/+233247055443"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center text-pink-600 hover:text-pink-700 transition"
+                >
+                  <FeatherIcon icon="message-circle" className="mr-2 w-5 h-5" />
+                  Contact Us
+                </a>
+              </div>
             </form>
           </div>
         )}
@@ -294,17 +305,6 @@ const StudentLogin = () => {
           </div>
         )}
       </div>
-      <footer className="w-full text-center py-4 text-pink-600 relative z-10">
-        <a
-          href="https://wa.me/+233247055443"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center text-pink-600 hover:text-pink-700 transition"
-        >
-          <FeatherIcon icon="message-circle" className="mr-2 w-5 h-5" />
-          Contact Us
-        </a>
-      </footer>
     </div>
   );
 };
